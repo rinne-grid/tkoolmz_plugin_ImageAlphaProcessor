@@ -3,6 +3,7 @@
 // 画像透過処理テスト用スクリプト
 //=============================================================================
 
+const targetImagePath = "img/pictures/actor2.jpg";
 /**
  * 画像透過処理テストクラス
  */
@@ -16,7 +17,7 @@ class ImageTransparencyTest {
     try {
       // 指定されたJPEG画像を透過処理
       const transparentBitmap = await loadJpegPseudoAlphaChannel(
-        "img/pictures/7793c685-5b51-47de-b3b5-c3a72484f8cc.jpg"
+        targetImagePath
       );
 
       console.log(
@@ -44,7 +45,7 @@ class ImageTransparencyTest {
 
     try {
       const transparentBitmap = await loadJpegHighQualityTransparent(
-        "img/pictures/7793c685-5b51-47de-b3b5-c3a72484f8cc.jpg"
+        targetImagePath
       );
 
       if (SceneManager._scene instanceof Scene_Map) {
@@ -65,9 +66,7 @@ class ImageTransparencyTest {
     console.log("高速透過処理テストを開始します");
 
     try {
-      const transparentBitmap = await loadJpegFastTransparent(
-        "img/pictures/7793c685-5b51-47de-b3b5-c3a72484f8cc.jpg"
-      );
+      const transparentBitmap = await loadJpegFastTransparent(targetImagePath);
 
       if (SceneManager._scene instanceof Scene_Map) {
         this.displayTestSprite(transparentBitmap, 500, 100, "高速");
@@ -96,7 +95,7 @@ class ImageTransparencyTest {
 
     try {
       const transparentBitmap = await loadJpegPseudoAlphaChannel(
-        "img/pictures/d41a8147-14ce-4879-983f-a62237e3438e.jpg",
+        targetImagePath,
         customOptions
       );
 
@@ -119,7 +118,7 @@ class ImageTransparencyTest {
 
     try {
       const transparentBitmap = await loadJpegPureWhiteTransparent(
-        "img/pictures/7793c685-5b51-47de-b3b5-c3a72484f8cc.jpg"
+        targetImagePath
       );
 
       if (SceneManager._scene instanceof Scene_Map) {
@@ -141,7 +140,7 @@ class ImageTransparencyTest {
 
     try {
       const transparentBitmap = await loadJpegAIOptimizedTransparent(
-        "img/pictures/7793c685-5b51-47de-b3b5-c3a72484f8cc.jpg"
+        targetImagePath
       );
 
       if (SceneManager._scene instanceof Scene_Map) {
@@ -163,7 +162,7 @@ class ImageTransparencyTest {
 
     try {
       const transparentBitmap = await loadJpegSimpleTransparent(
-        "img/pictures/7793c685-5b51-47de-b3b5-c3a72484f8cc.jpg"
+        targetImagePath
       );
 
       if (SceneManager._scene instanceof Scene_Map) {
@@ -185,7 +184,7 @@ class ImageTransparencyTest {
 
     try {
       const transparentBitmap = await loadJpegSuperSmoothTransparent(
-        "img/pictures/7793c685-5b51-47de-b3b5-c3a72484f8cc.jpg"
+        targetImagePath
       );
 
       if (SceneManager._scene instanceof Scene_Map) {
@@ -285,7 +284,7 @@ class ImageTransparencyTest {
 
     try {
       const transparentBitmap = await loadJpegSuperSmoothTransparent(
-        "img/pictures/7793c685-5b51-47de-b3b5-c3a72484f8cc.jpg"
+        targetImagePath
       );
 
       if (SceneManager._scene instanceof Scene_Map) {
@@ -308,8 +307,7 @@ class ImageTransparencyTest {
 
     try {
       const transparentBitmap = await loadJpegAIOptimizedTransparent(
-        // "img/pictures/7793c685-5b51-47de-b3b5-c3a72484f8cc.jpg",
-        "img/pictures/d41a8147-14ce-4879-983f-a62237e3438e.jpg"
+        targetImagePath
       );
 
       if (SceneManager._scene instanceof Scene_Map) {
@@ -332,7 +330,7 @@ class ImageTransparencyTest {
 
     try {
       const transparentBitmap = await loadJpegPhotoGradeTransparent(
-        "img/pictures/7793c685-5b51-47de-b3b5-c3a72484f8cc.jpg"
+        targetImagePath
       );
 
       if (SceneManager._scene instanceof Scene_Map) {
@@ -377,12 +375,12 @@ class CustomColorTransparencyTest {
     console.log("RGB指定透過処理テストを開始します");
 
     try {
-      // 例：赤色 (255, 0, 0) を透過
+      // 例：緑色 (0, 255, 0) を透過
       const transparentBitmap = await loadJpegRGBColorTransparent(
-        "img/pictures/7793c685-5b51-47de-b3b5-c3a72484f8cc.jpg",
-        255,
+        targetImagePath,
         0,
-        0, // 赤色を指定
+        255,
+        0, // 緑色を指定
         { threshold: 20, smooth: true, featherRadius: 2 }
       );
 
@@ -391,7 +389,7 @@ class CustomColorTransparencyTest {
           transparentBitmap,
           100,
           200,
-          "RGB赤透過"
+          "RGB緑透過"
         );
       }
 
@@ -404,16 +402,59 @@ class CustomColorTransparencyTest {
   }
 
   /**
+   * 緑色透過デバッグテスト（詳細ログ付き）
+   */
+  static async testGreenTransparencyDebug() {
+    console.log("=== 緑色透過デバッグテスト開始 ===");
+
+    // 様々な閾値で緑色透過をテスト
+    const thresholds = [95];
+
+    for (const threshold of thresholds) {
+      console.log(`\n--- 閾値 ${threshold} でのテスト ---`);
+
+      try {
+        const transparentBitmap = await loadJpegGreenBackgroundTransparent(
+          targetImagePath,
+          // 0,
+          // 255,
+          // 0, // 純緑色
+          {
+            threshold: threshold,
+            smooth: true, // デバッグ用にスムージングOFF
+            featherRadius: 1.5,
+          }
+        );
+
+        if (SceneManager._scene instanceof Scene_Map) {
+          ImageTransparencyTest.displayTestSprite(
+            transparentBitmap,
+            50 + threshold,
+            50,
+            `緑T${threshold}`
+          );
+        }
+
+        console.log(`閾値 ${threshold}: 成功`);
+      } catch (error) {
+        console.error(`閾値 ${threshold}: エラー -`, error.message);
+      }
+    }
+
+    console.log("=== 緑色透過デバッグテスト完了 ===");
+  }
+
+  /**
    * 16進数カラーコード指定透過処理テスト
    */
   static async testHexColorTransparency() {
     console.log("16進数カラーコード指定透過処理テストを開始します");
 
     try {
-      // 例：白色 "#ffffff" を透過
+      // 例：緑色 "#00ff00 を透過
       const transparentBitmap = await loadJpegHexColorTransparent(
-        "img/pictures/7793c685-5b51-47de-b3b5-c3a72484f8cc.jpg",
-        "#ffffff", // 白色を指定
+        targetImagePath,
+        "#00ff00", // 白色を指定
         { threshold: 15, smooth: true, featherRadius: 1.5 }
       );
 
@@ -422,7 +463,7 @@ class CustomColorTransparencyTest {
           transparentBitmap,
           300,
           200,
-          "HEX白透過"
+          "HEX透過"
         );
       }
 
@@ -443,7 +484,7 @@ class CustomColorTransparencyTest {
     try {
       // 例：薄いグレー色を透過
       const transparentBitmap = await loadJpegCustomColorTransparent(
-        "img/pictures/7793c685-5b51-47de-b3b5-c3a72484f8cc.jpg",
+        targetImagePath,
         { r: 240, g: 240, b: 240 }, // 薄いグレー
         { threshold: 10, smooth: true, featherRadius: 2 }
       );
@@ -474,8 +515,8 @@ class CustomColorTransparencyTest {
     try {
       await Promise.all([
         this.testRGBColorTransparency(),
-        this.testHexColorTransparency(),
-        this.testCustomBackgroundColor(),
+        // this.testHexColorTransparency(),
+        // this.testCustomBackgroundColor(),
       ]);
 
       console.log("全カスタム色透過処理テストが完了しました");
@@ -524,6 +565,8 @@ window.testCustomColor = () =>
   CustomColorTransparencyTest.testCustomBackgroundColor();
 window.testAllCustomColors = () =>
   CustomColorTransparencyTest.runAllCustomColorTests();
+window.testGreenDebug = () =>
+  CustomColorTransparencyTest.testGreenTransparencyDebug();
 
 console.log("ImageTransparencyTest クラスが読み込まれました");
 console.log("testImageTransparency() で全テストを開始できます");
@@ -538,3 +581,4 @@ console.log("testRGBColor() でRGB指定透過処理をテストできます");
 console.log("testHexColor() で16進数カラーコード指定透過処理をテストできます");
 console.log("testCustomColor() でカスタム背景色透過処理をテストできます");
 console.log("testAllCustomColors() で全カスタム色透過処理テストを実行できます");
+console.log("testGreenDebug() で緑色透過の詳細デバッグができます");

@@ -13,7 +13,27 @@
  * 画像生成AIで作られたJPEG画像の白背景を透明にする機能を提供します。
  *
  * 使用例:
+ * // 基本的な白背景透過
  * const transparentBitmap = await loadJpegPseudoAlphaChannel('img/pictures/example.jpg');
+ *
+ * // 基本色別プリセット関数の使用例
+ * const redBg = await loadJpegRedBackgroundTransparent('img/characters/hero_red.jpg');
+ * const greenBg = await loadJpegGreenBackgroundTransparent('img/characters/hero_green.jpg');
+ * const blueBg = await loadJpegBlueBackgroundTransparent('img/characters/hero_blue.jpg');
+ * const whiteBg = await loadJpegWhiteBackgroundTransparent('img/characters/hero_white.jpg');
+ * const blackBg = await loadJpegBlackBackgroundTransparent('img/characters/hero_black.jpg');
+ *
+ * // 拡張色プリセット関数の使用例
+ * const grayBg = await loadJpegGrayBackgroundTransparent('img/items/sword_gray.jpg');
+ * const cyanBg = await loadJpegCyanBackgroundTransparent('img/effects/magic_cyan.jpg');
+ * const magentaBg = await loadJpegMagentaBackgroundTransparent('img/effects/spell_magenta.jpg');
+ * const yellowBg = await loadJpegYellowBackgroundTransparent('img/items/gold_yellow.jpg');
+ *
+ * // カスタム設定での使用例
+ * const customRed = await loadJpegRedBackgroundTransparent('img/test.jpg', {
+ *   threshold: 15,      // より緩い判定
+ *   featherRadius: 3.0  // より大きなフェザー効果
+ * });
  *
  * @param whiteThreshold
  * @text 白色判定閾値
@@ -24,10 +44,10 @@
  * @default 240
  *
  * @param smoothEdges
- * @text エッジスムー  /**
- * プリセット関数: AI画像最適化透過処理（Lab色空間版）
- * @param {string} imagePath - 画像パス
- * @returns {Promise<Bitmap>} 処理済みBitmap
+ * @text エッジスムージングを行うか
+ * @desc エッジスムージングを行うか
+ * @type boolean
+ * @default true
  */
 window.loadJpegAIOptimizedTransparent = function (imagePath) {
   return loadJpegPseudoAlphaChannel(imagePath, {
@@ -61,6 +81,193 @@ window.loadJpegSuperSmoothTransparent = function (imagePath) {
     smooth: true,
     featherRadius: 3, // 大きなフェザー半径でプロ仕様
   });
+};
+
+/**
+ * 基本色別透過処理プリセット関数群
+ * よく使われる基本色（赤、緑、青、白、黒）の背景を透過する専用関数
+ */
+
+/**
+ * プリセット関数: 赤色背景透過処理 (#FF0000)
+ * @param {string} imagePath - 画像パス
+ * @param {object} options - 追加オプション（省略可能）
+ * @returns {Promise<Bitmap>} 処理済みBitmap
+ */
+window.loadJpegRedBackgroundTransparent = function (imagePath, options = {}) {
+  return loadJpegCustomColorTransparent(
+    imagePath,
+    { r: 255, g: 0, b: 0 },
+    {
+      threshold: options.threshold || 12, // 赤系の色差に適した閾値
+      smooth: options.smooth !== undefined ? options.smooth : true,
+      featherRadius: options.featherRadius || 1.5,
+      ...options,
+    }
+  );
+};
+
+/**
+ * プリセット関数: 緑色背景透過処理 (#00FF00)
+ * @param {string} imagePath - 画像パス
+ * @param {object} options - 追加オプション（省略可能）
+ * @returns {Promise<Bitmap>} 処理済みBitmap
+ */
+window.loadJpegGreenBackgroundTransparent = function (imagePath, options = {}) {
+  return loadJpegCustomColorTransparent(
+    imagePath,
+    { r: 0, g: 255, b: 0 },
+    {
+      threshold: options.threshold || 12, // 緑系の色差に適した閾値
+      smooth: options.smooth !== undefined ? options.smooth : true,
+      featherRadius: options.featherRadius || 1.5,
+      ...options,
+    }
+  );
+};
+
+/**
+ * プリセット関数: 青色背景透過処理 (#0000FF)
+ * @param {string} imagePath - 画像パス
+ * @param {object} options - 追加オプション（省略可能）
+ * @returns {Promise<Bitmap>} 処理済みBitmap
+ */
+window.loadJpegBlueBackgroundTransparent = function (imagePath, options = {}) {
+  return loadJpegCustomColorTransparent(
+    imagePath,
+    { r: 0, g: 0, b: 255 },
+    {
+      threshold: options.threshold || 12, // 青系の色差に適した閾値
+      smooth: options.smooth !== undefined ? options.smooth : true,
+      featherRadius: options.featherRadius || 1.5,
+      ...options,
+    }
+  );
+};
+
+/**
+ * プリセット関数: 純白背景透過処理 (#FFFFFF)
+ * @param {string} imagePath - 画像パス
+ * @param {object} options - 追加オプション（省略可能）
+ * @returns {Promise<Bitmap>} 処理済みBitmap
+ */
+window.loadJpegWhiteBackgroundTransparent = function (imagePath, options = {}) {
+  return loadJpegCustomColorTransparent(
+    imagePath,
+    { r: 255, g: 255, b: 255 },
+    {
+      threshold: options.threshold || 8, // 白色は厳密に判定
+      smooth: options.smooth !== undefined ? options.smooth : true,
+      featherRadius: options.featherRadius || 1.8, // 白背景は少し大きめのフェザー
+      ...options,
+    }
+  );
+};
+
+/**
+ * プリセット関数: 黒色背景透過処理 (#000000)
+ * @param {string} imagePath - 画像パス
+ * @param {object} options - 追加オプション（省略可能）
+ * @returns {Promise<Bitmap>} 処理済みBitmap
+ */
+window.loadJpegBlackBackgroundTransparent = function (imagePath, options = {}) {
+  return loadJpegCustomColorTransparent(
+    imagePath,
+    { r: 0, g: 0, b: 0 },
+    {
+      threshold: options.threshold || 15, // 黒色は陰影との区別が難しいため緩めの設定
+      smooth: options.smooth !== undefined ? options.smooth : true,
+      featherRadius: options.featherRadius || 2.0, // 黒背景は大きめのフェザーで自然に
+      ...options,
+    }
+  );
+};
+
+/**
+ * 拡張色別透過処理プリセット関数群
+ * よく使われる中間色や特殊色の背景透過処理
+ */
+
+/**
+ * プリセット関数: グレー背景透過処理 (#808080)
+ * @param {string} imagePath - 画像パス
+ * @param {object} options - 追加オプション（省略可能）
+ * @returns {Promise<Bitmap>} 処理済みBitmap
+ */
+window.loadJpegGrayBackgroundTransparent = function (imagePath, options = {}) {
+  return loadJpegCustomColorTransparent(
+    imagePath,
+    { r: 128, g: 128, b: 128 },
+    {
+      threshold: options.threshold || 20, // グレーは色調判定が複雑なため大きめ
+      smooth: options.smooth !== undefined ? options.smooth : true,
+      featherRadius: options.featherRadius || 2.5,
+      ...options,
+    }
+  );
+};
+
+/**
+ * プリセット関数: シアン背景透過処理 (#00FFFF) - グリーンバック代替
+ * @param {string} imagePath - 画像パス
+ * @param {object} options - 追加オプション（省略可能）
+ * @returns {Promise<Bitmap>} 処理済みBitmap
+ */
+window.loadJpegCyanBackgroundTransparent = function (imagePath, options = {}) {
+  return loadJpegCustomColorTransparent(
+    imagePath,
+    { r: 0, g: 255, b: 255 },
+    {
+      threshold: options.threshold || 10, // シアンは比較的判定しやすい
+      smooth: options.smooth !== undefined ? options.smooth : true,
+      featherRadius: options.featherRadius || 1.5,
+      ...options,
+    }
+  );
+};
+
+/**
+ * プリセット関数: マゼンタ背景透過処理 (#FF00FF)
+ * @param {string} imagePath - 画像パス
+ * @param {object} options - 追加オプション（省略可能）
+ * @returns {Promise<Bitmap>} 処理済みBitmap
+ */
+window.loadJpegMagentaBackgroundTransparent = function (
+  imagePath,
+  options = {}
+) {
+  return loadJpegCustomColorTransparent(
+    imagePath,
+    { r: 255, g: 0, b: 255 },
+    {
+      threshold: options.threshold || 10, // マゼンタも判定しやすい
+      smooth: options.smooth !== undefined ? options.smooth : true,
+      featherRadius: options.featherRadius || 1.5,
+      ...options,
+    }
+  );
+};
+
+/**
+ * プリセット関数: イエロー背景透過処理 (#FFFF00)
+ * @param {string} imagePath - 画像パス
+ * @param {object} options - 追加オプション（省略可能）
+ * @returns {Promise<Bitmap>} 処理済みBitmap
+ */
+window.loadJpegYellowBackgroundTransparent = function (
+  imagePath,
+  options = {}
+) {
+  return loadJpegCustomColorTransparent(
+    imagePath,
+    { r: 255, g: 255, b: 0 },
+    {
+      threshold: options.threshold || 12, // 黄色は肌色との区別が重要
+      smooth: options.smooth !== undefined ? options.smooth : true,
+      featherRadius: options.featherRadius || 1.8,
+      ...options,
+    }
+  );
 };
 
 /**
@@ -607,10 +814,14 @@ window.loadJpegHexColorTransparent = function (
       );
     }
 
-    // Step 2: Lab色空間での高精度判定
+    // Lab色空間での高精度判定
     const alphaMap = new Float32Array(width * height);
     let transparentCount = 0;
     let opaqueCount = 0;
+
+    // デバッグ用：サンプル色を記録
+    const samplePixels = [];
+    const maxSamples = 10;
 
     for (let i = 0; i < data.length; i += 4) {
       const pixel = {
@@ -627,6 +838,31 @@ window.loadJpegHexColorTransparent = function (
         threshold
       );
 
+      // デバッグ用：最初の数ピクセルの詳細を記録
+      if (samplePixels.length < maxSamples) {
+        const pixelLab = rgbToLab(pixel.r, pixel.g, pixel.b);
+        const bgLab = rgbToLab(
+          backgroundColor.r,
+          backgroundColor.g,
+          backgroundColor.b
+        );
+        const deltaE = Math.sqrt(
+          Math.pow(pixelLab.L - bgLab.L, 2) +
+            Math.pow(pixelLab.a - bgLab.a, 2) +
+            Math.pow(pixelLab.b - bgLab.b, 2)
+        );
+
+        samplePixels.push({
+          rgb: `RGB(${pixel.r},${pixel.g},${pixel.b})`,
+          lab: `Lab(${pixelLab.L.toFixed(1)},${pixelLab.a.toFixed(
+            1
+          )},${pixelLab.b.toFixed(1)})`,
+          deltaE: deltaE.toFixed(2),
+          isBackground: isBackground,
+          threshold: threshold,
+        });
+      }
+
       if (isBackground) {
         // 背景色の場合: 完全に透明
         alphaMap[pixelIndex] = 0;
@@ -637,6 +873,21 @@ window.loadJpegHexColorTransparent = function (
         opaqueCount++;
       }
     }
+
+    // デバッグ情報を出力
+    console.log("=== 透過処理デバッグ情報 ===");
+    console.log(
+      `指定背景色: RGB(${backgroundColor.r}, ${backgroundColor.g}, ${backgroundColor.b})`
+    );
+    console.log(`使用閾値: ${threshold}`);
+    console.log("サンプルピクセル判定結果:");
+    samplePixels.forEach((sample, index) => {
+      console.log(
+        `${index + 1}. ${sample.rgb} → ${sample.lab} | DeltaE: ${
+          sample.deltaE
+        } | 閾値: ${sample.threshold} | 背景判定: ${sample.isBackground}`
+      );
+    });
 
     // Step 3: バイラテラルフィルタによるエッジ保持スムージング
     if (smooth) {
