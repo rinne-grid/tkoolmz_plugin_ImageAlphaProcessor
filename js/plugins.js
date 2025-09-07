@@ -4,5 +4,6 @@ var $plugins =
 [
 {"name":"AlwaysActive","status":true,"description":"非アクティブ時もゲーム更新を止めない（常時アクティブ）","parameters":{}},
 {"name":"ImageAlphaProcessor","status":true,"description":"[v1.0.0] 画像生成AI用白背景透過プラグイン","parameters":{"whiteThreshold":"240","smoothEdges":"true"}},
-{"name":"ImageTransparencyTest","status":true,"description":"","parameters":{}}
+{"name":"ImageTransparencyTest","status":true,"description":"","parameters":{}},
+{"name":"ImageBatchProcessor","status":true,"description":"[v1.0.0] 画像バッチ透過処理プラグイン","parameters":{"sourceDirectory":"converter_source","outputDirectory":"converter_dist","defaultThreshold":"80","defaultSmooth":"true","defaultFeatherRadius":"1.5","autoDownload":"true","maxFiles":"20"}}
 ];
